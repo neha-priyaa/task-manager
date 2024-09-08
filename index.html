@@ -91,6 +91,7 @@
         <ul id="taskList"></ul>
     </div>
     <script>
+        // Function to add a task
         function addTask() {
             const taskInput = document.getElementById('taskInput');
             const taskTime = document.getElementById('taskTime');
@@ -101,33 +102,51 @@
                 return;
             }
 
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <span>${taskInput.value} - ${new Date(taskTime.value).toLocaleString()}</span>
-                <button onclick="removeTask(this)">Delete</button>
-            `;
+            // Create a task object
+            const task = {
+                text: taskInput.value,
+                time: taskTime.value
+            };
 
-            taskList.appendChild(li);
+            // Save the task to localStorage
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
 
-            // Schedule notification
-            const taskDate = new Date(taskTime.value);
-            const now = new Date();
-            const timeDifference = taskDate - now;
+            // Display the task
+            displayTasks();
 
-            if (timeDifference > 0) {
-                setTimeout(() => {
-                    alert(`Reminder: ${taskInput.value}`);
-                }, timeDifference);
-            }
-
+            // Clear input fields
             taskInput.value = '';
             taskTime.value = '';
         }
 
-        function removeTask(button) {
-            const taskList = document.getElementById('taskList');
-            taskList.removeChild(button.parentElement);
+        // Function to remove a task
+        function removeTask(index) {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.splice(index, 1);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            displayTasks();
         }
+
+        // Function to display tasks
+        function displayTasks() {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${task.text} - ${new Date(task.time).toLocaleString()}</span>
+                    <button onclick="removeTask(${index})">Delete</button>
+                `;
+                taskList.appendChild(li);
+            });
+        }
+
+        // Display tasks on page load
+        window.onload = displayTasks;
     </script>
 </body>
 </html>
