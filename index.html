@@ -7,7 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background: url('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.canva.com%2Ftemplates%2Fs%2Fcool-wallpaper%2F&psig=AOvVaw3YxJrk1o9mwL8Ts9G_r5pe&ust=1725901299453000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCKDQqsPps4gDFQAAAAAdAAAAABAE') no-repeat center center fixed;
+            background-size: cover;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,7 +19,7 @@
         .container {
             width: 100%;
             max-width: 600px;
-            background: #fff;
+            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
             padding: 20px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             border-radius: 8px;
@@ -91,7 +92,7 @@
         <ul id="taskList"></ul>
     </div>
     <script>
-        // Function to add a task
+        // JavaScript code for handling tasks
         function addTask() {
             const taskInput = document.getElementById('taskInput');
             const taskTime = document.getElementById('taskTime');
@@ -102,26 +103,20 @@
                 return;
             }
 
-            // Create a task object
             const task = {
                 text: taskInput.value,
                 time: taskTime.value
             };
 
-            // Save the task to localStorage
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
             tasks.push(task);
             localStorage.setItem('tasks', JSON.stringify(tasks));
 
-            // Display the task
             displayTasks();
-
-            // Clear input fields
             taskInput.value = '';
             taskTime.value = '';
         }
 
-        // Function to remove a task
         function removeTask(index) {
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
             tasks.splice(index, 1);
@@ -129,7 +124,6 @@
             displayTasks();
         }
 
-        // Function to display tasks
         function displayTasks() {
             const taskList = document.getElementById('taskList');
             taskList.innerHTML = '';
@@ -145,7 +139,6 @@
             });
         }
 
-        // Display tasks on page load
         window.onload = displayTasks;
     </script>
 </body>
