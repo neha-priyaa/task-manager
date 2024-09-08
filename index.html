@@ -61,6 +61,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 8px;
+        }
+
+        li.completed span {
+            text-decoration: line-through;
+            color: gray;
         }
 
         li span {
@@ -79,6 +85,22 @@
         li button:hover {
             background-color: #c82333;
         }
+
+        .task-check {
+            margin-right: 10px;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -90,7 +112,9 @@
             <button onclick="addTask()">Add Task</button>
         </div>
         <ul id="taskList"></ul>
+        <div id="message" class="message hidden">Good job! All tasks completed!</div>
     </div>
+
     <script>
         // JavaScript code for handling tasks
         function addTask() {
@@ -105,7 +129,8 @@
 
             const task = {
                 text: taskInput.value,
-                time: taskTime.value
+                time: taskTime.value,
+                completed: false
             };
 
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -124,19 +149,41 @@
             displayTasks();
         }
 
+        function toggleTaskCompletion(index) {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks[index].completed = !tasks[index].completed;
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            displayTasks();
+        }
+
         function displayTasks() {
             const taskList = document.getElementById('taskList');
+            const message = document.getElementById('message');
             taskList.innerHTML = '';
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
+            if (tasks.length === 0) {
+                message.classList.remove('hidden');
+            } else {
+                message.classList.add('hidden');
+            }
+
             tasks.forEach((task, index) => {
                 const li = document.createElement('li');
+                li.classList.toggle('completed', task.completed);
                 li.innerHTML = `
+                    <input type="checkbox" class="task-check" ${task.completed ? 'checked' : ''} onclick="toggleTaskCompletion(${index})">
                     <span>${task.text} - ${new Date(task.time).toLocaleString()}</span>
                     <button onclick="removeTask(${index})">Delete</button>
                 `;
                 taskList.appendChild(li);
             });
+
+            if (tasks.every(task => task.completed)) {
+                message.classList.remove('hidden');
+            } else {
+                message.classList.add('hidden');
+            }
         }
 
         window.onload = displayTasks;
