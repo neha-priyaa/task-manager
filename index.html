@@ -19,7 +19,7 @@
         .container {
             width: 100%;
             max-width: 600px;
-            background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             border-radius: 8px;
@@ -101,6 +101,18 @@
         .hidden {
             display: none;
         }
+
+        .arrow {
+            cursor: pointer;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .arrow span {
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -112,11 +124,20 @@
             <button onclick="addTask()">Add Task</button>
         </div>
         <ul id="taskList"></ul>
+
+        <!-- Arrow to toggle completed tasks -->
+        <div class="arrow" id="toggleArrow" onclick="toggleCompletedTasks()">
+            <span id="arrowIcon">▶</span>
+            <span>Show Completed Tasks</span>
+        </div>
+        <ul id="completedTasks" class="hidden"></ul>
+
         <div id="message" class="message hidden">Good job! All tasks completed!</div>
     </div>
 
     <script>
-        // JavaScript code for handling tasks
+        let showCompleted = false;
+
         function addTask() {
             const taskInput = document.getElementById('taskInput');
             const taskTime = document.getElementById('taskTime');
@@ -142,7 +163,7 @@
             taskTime.value = '';
         }
 
-        function removeTask(index) {
+        function removeTask(index, completed = false) {
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
             tasks.splice(index, 1);
             localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -158,9 +179,14 @@
 
         function displayTasks() {
             const taskList = document.getElementById('taskList');
+            const completedTasks = document.getElementById('completedTasks');
             const message = document.getElementById('message');
             taskList.innerHTML = '';
+            completedTasks.innerHTML = '';
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+            const pendingTasks = tasks.filter(task => !task.completed);
+            const doneTasks = tasks.filter(task => task.completed);
 
             if (tasks.length === 0) {
                 message.classList.remove('hidden');
@@ -168,21 +194,48 @@
                 message.classList.add('hidden');
             }
 
-            tasks.forEach((task, index) => {
+            pendingTasks.forEach((task, index) => {
                 const li = document.createElement('li');
-                li.classList.toggle('completed', task.completed);
                 li.innerHTML = `
-                    <input type="checkbox" class="task-check" ${task.completed ? 'checked' : ''} onclick="toggleTaskCompletion(${index})">
+                    <input type="checkbox" class="task-check" onclick="toggleTaskCompletion(${index})">
                     <span>${task.text} - ${new Date(task.time).toLocaleString()}</span>
                     <button onclick="removeTask(${index})">Delete</button>
                 `;
                 taskList.appendChild(li);
             });
 
-            if (tasks.every(task => task.completed)) {
+            doneTasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                li.classList.add('completed');
+                li.innerHTML = `
+                    <input type="checkbox" class="task-check" checked onclick="toggleTaskCompletion(${index})">
+                    <span>${task.text} - ${new Date(task.time).toLocaleString()}</span>
+                    <button onclick="removeTask(${index}, true)">Delete</button>
+                `;
+                completedTasks.appendChild(li);
+            });
+
+            if (pendingTasks.length === 0 && doneTasks.length > 0) {
                 message.classList.remove('hidden');
             } else {
                 message.classList.add('hidden');
+            }
+        }
+
+        function toggleCompletedTasks() {
+            const completedTasks = document.getElementById('completedTasks');
+            const arrowIcon = document.getElementById('arrowIcon');
+            const arrowText = document.querySelector('.arrow span:last-child');
+            showCompleted = !showCompleted;
+
+            if (showCompleted) {
+                completedTasks.classList.remove('hidden');
+                arrowIcon.textContent = '▼';
+                arrowText.textContent = 'Hide Completed Tasks';
+            } else {
+                completedTasks.classList.add('hidden');
+                arrowIcon.textContent = '▶';
+                arrowText.textContent = 'Show Completed Tasks';
             }
         }
 
