@@ -4,45 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: system-ui;
-            background: url('back.jpg') no-repeat center center fixed;
-            background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        /* Task Manager styles with the gradient and interactive background */
+        
+        :root {
+            --color-bg1: rgb(8, 10, 15);
+            --color-bg2: rgb(0, 17, 32);
+            --color1: 18, 113, 255;
+            --color2: 107, 74, 255;
+            --color3: 100, 100, 255;
+            --color4: 50, 160, 220;
+            --color5: 80, 47, 122;
+            --color-interactive: 140, 100, 255;
+            --circle-size: 80%;
+            --blending: hard-light;
         }
 
-        .container {
+        * {
+            margin:0;
+            padding:0;
+            outline:none;
+            list-style:none;
+            text-decoration:none;
+            box-sizing:border-box;
+            color:#FFF;
+            background: transparent;
+            border:none;
+        }
+
+        html, body {
+            font-family: 'Dongle', sans-serif;
+            height: 100%;
             width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .card {
+            position: absolute;
+            z-index: 10;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             max-width: 600px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 48px;
+            backdrop-filter: blur(10px);
             border-radius: 8px;
+            box-shadow: 0 4px 90px rgba(0,0,0,0.1);
+            overflow: hidden;
+            user-select: none;
         }
 
-        .task-form {
-            margin-bottom: 20px;
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 16px;
         }
 
-        input[type="text"], input[type="datetime-local"] {
-            width: calc(50% - 10px);
+        p {
+            line-height: 1.6;
+        }
+
+        .task-form input, .task-form button {
             padding: 10px;
             margin: 5px;
-            border: 1px solid #ddd;
             border-radius: 4px;
         }
 
         button {
-            padding: 10px 20px;
-            border: none;
             background-color: #28a745;
             color: white;
-            border-radius: 4px;
+            border: none;
             cursor: pointer;
         }
 
@@ -64,76 +101,96 @@
             border-radius: 8px;
         }
 
-        li.completed span {
-            text-decoration: line-through;
-            color: gray;
+        .gradient-bg {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(40deg, var(--color-bg1), var(--color-bg2));
         }
 
-        li span {
-            flex: 1;
+        .noiseBg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            mix-blend-mode: soft-light;
+            opacity: 0.3;
         }
 
-        li button {
-            background-color: #dc3545;
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
+        .gradients-container {
+            filter: url(#goo) blur(40px);
+            width: 100%;
+            height: 100%;
         }
 
-        li button:hover {
-            background-color: #c82333;
+        .g1, .g2, .g3, .g4, .g5 {
+            position: absolute;
+            width: var(--circle-size);
+            height: var(--circle-size);
+            mix-blend-mode: var(--blending);
         }
 
-        .task-check {
-            margin-right: 10px;
-        }
-
-        .message {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #28a745;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .arrow {
-            cursor: pointer;
-            font-size: 18px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        .arrow span {
-            margin-left: 8px;
+        .interactive {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: -50%;
+            left: -50%;
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Task Manager</h1>
-        <div class="task-form">
-            <input type="text" id="taskInput" placeholder="Enter task">
-            <input type="datetime-local" id="taskTime">
-            <button onclick="addTask()">Add Task</button>
+    <!-- Gradient and Noise Background -->
+    <div class="gradient-bg">
+        <svg xmlns='http://www.w3.org/2000/svg' class="noiseBg" viewBox="0 0 100% 100%">
+            <filter id='noiseFilterBg'>
+                <feTurbulence type='fractalNoise' baseFrequency='0.6' stitchTiles='stitch' />
+            </filter>
+            <rect width='100%' height='100%' filter='url(#noiseFilterBg)' />
+        </svg>
+        <div class="gradients-container">
+            <div class="g1"></div>
+            <div class="g2"></div>
+            <div class="g3"></div>
+            <div class="g4"></div>
+            <div class="g5"></div>
+            <div class="interactive"></div>
         </div>
-        <ul id="taskList"></ul>
-
-        <!-- Arrow to toggle completed tasks -->
-        <div class="arrow" id="toggleArrow" onclick="toggleCompletedTasks()">
-            <span id="arrowIcon">▶</span>
-            <span>Show Completed Tasks</span>
-        </div>
-        <ul id="completedTasks" class="hidden"></ul>
-
-        <div id="message" class="message hidden">Good job! All tasks completed!</div>
     </div>
+
+    <!-- Task Manager Card -->
+    <div class="card">
+        <div class="content">
+            <h1>Task Manager</h1>
+            <div class="task-form">
+                <input type="text" id="taskInput" placeholder="Enter task">
+                <input type="datetime-local" id="taskTime">
+                <button onclick="addTask()">Add Task</button>
+            </div>
+            <ul id="taskList"></ul>
+            <div class="arrow" id="toggleArrow" onclick="toggleCompletedTasks()">
+                <span id="arrowIcon">▶</span>
+                <span>Show Completed Tasks</span>
+            </div>
+            <ul id="completedTasks" class="hidden"></ul>
+            <div id="message" class="message hidden">Good job! All tasks completed!</div>
+        </div>
+    </div>
+
+    <!-- Include SVG filter definitions -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="svgBlur" style="display:none;">
+        <defs>
+            <filter id="goo">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                <feBlend in="SourceGraphic" in2="goo" />
+            </filter>
+        </defs>
+    </svg>
 
     <script>
         let showCompleted = false;
@@ -142,7 +199,6 @@
             const taskInput = document.getElementById('taskInput');
             const taskTime = document.getElementById('taskTime');
             const taskList = document.getElementById('taskList');
-
             if (taskInput.value === '' || taskTime.value === '') {
                 alert('Please enter both task and time.');
                 return;
@@ -157,7 +213,6 @@
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
             tasks.push(task);
             localStorage.setItem('tasks', JSON.stringify(tasks));
-
             displayTasks();
             taskInput.value = '';
             taskTime.value = '';
@@ -188,16 +243,10 @@
             const pendingTasks = tasks.filter(task => !task.completed);
             const doneTasks = tasks.filter(task => task.completed);
 
-            if (tasks.length === 0) {
-                message.classList.remove('hidden');
-            } else {
-                message.classList.add('hidden');
-            }
-
             pendingTasks.forEach((task, index) => {
                 const li = document.createElement('li');
                 li.innerHTML = `
-                    <input type="checkbox" class="task-check" onclick="toggleTaskCompletion(${index})">
+                    <input type="checkbox" onclick="toggleTaskCompletion(${index})">
                     <span>${task.text} - ${new Date(task.time).toLocaleString()}</span>
                     <button onclick="removeTask(${index})">Delete</button>
                 `;
@@ -206,40 +255,40 @@
 
             doneTasks.forEach((task, index) => {
                 const li = document.createElement('li');
-                li.classList.add('completed');
                 li.innerHTML = `
-                    <input type="checkbox" class="task-check" checked onclick="toggleTaskCompletion(${index})">
+                    <input type="checkbox" checked onclick="toggleTaskCompletion(${index})">
                     <span>${task.text} - ${new Date(task.time).toLocaleString()}</span>
                     <button onclick="removeTask(${index}, true)">Delete</button>
                 `;
                 completedTasks.appendChild(li);
             });
 
-            if (pendingTasks.length === 0 && doneTasks.length > 0) {
-                message.classList.remove('hidden');
-            } else {
-                message.classList.add('hidden');
-            }
+            message.classList.toggle('hidden', pendingTasks.length !== 0);
         }
 
-        function toggleCompletedTasks() {
-            const completedTasks = document.getElementById('completedTasks');
-            const arrowIcon = document.getElementById('arrowIcon');
-            const arrowText = document.querySelector('.arrow span:last-child');
-            showCompleted = !showCompleted;
+        document.addEventListener('DOMContentLoaded', () => {
+            displayTasks();
 
-            if (showCompleted) {
-                completedTasks.classList.remove('hidden');
-                arrowIcon.textContent = '▼';
-                arrowText.textContent = 'Hide Completed Tasks';
-            } else {
-                completedTasks.classList.add('hidden');
-                arrowIcon.textContent = '▶';
-                arrowText.textContent = 'Show Completed Tasks';
-            }
-        }
+            const interBubble = document.querySelector('.interactive');
+            let curX = 0;
+            let curY = 0;
+            let tgX = 0;
+            let tgY = 0;
 
-        window.onload = displayTasks;
+            const move = () => {
+                curX += (tgX - curX) / 20;
+                curY += (tgY - curY) / 20;
+                interBubble.style.transform = `translate(${Math.round(curX)}px, ${Math.round(curY)}px)`;
+                requestAnimationFrame(move);
+            };
+
+            window.addEventListener('mousemove', (event) => {
+                tgX = event.clientX;
+                tgY = event.clientY;
+            });
+
+            move();
+        });
     </script>
 </body>
 </html>
