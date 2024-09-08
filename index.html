@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+
+        .task-form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="datetime-local"] {
+            width: calc(50% - 10px);
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        li span {
+            flex: 1;
+        }
+
+        li button {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        li button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Manager</h1>
+        <div class="task-form">
+            <input type="text" id="taskInput" placeholder="Enter task">
+            <input type="datetime-local" id="taskTime">
+            <button onclick="addTask()">Add Task</button>
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+    <script>
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskTime = document.getElementById('taskTime');
+            const taskList = document.getElementById('taskList');
+
+            if (taskInput.value === '' || taskTime.value === '') {
+                alert('Please enter both task and time.');
+                return;
+            }
+
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span>${taskInput.value} - ${new Date(taskTime.value).toLocaleString()}</span>
+                <button onclick="removeTask(this)">Delete</button>
+            `;
+
+            taskList.appendChild(li);
+
+            // Schedule notification
+            const taskDate = new Date(taskTime.value);
+            const now = new Date();
+            const timeDifference = taskDate - now;
+
+            if (timeDifference > 0) {
+                setTimeout(() => {
+                    alert(`Reminder: ${taskInput.value}`);
+                }, timeDifference);
+            }
+
+            taskInput.value = '';
+            taskTime.value = '';
+        }
+
+        function removeTask(button) {
+            const taskList = document.getElementById('taskList');
+            taskList.removeChild(button.parentElement);
+        }
+    </script>
+</body>
+</html>
